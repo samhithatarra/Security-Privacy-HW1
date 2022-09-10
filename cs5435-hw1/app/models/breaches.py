@@ -55,9 +55,12 @@ def get_breaches(db, username, password):
 
     plaintext_breaches = db.query(PlaintextBreach).filter_by(username=username, password=password).all()
     hashed_breaches = db.query(HashedBreach).filter_by(username=username, hashed_password=hashlib.sha256(password.encode('utf-8')).hexdigest()).all()
-    print("test")
-    print(hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), bytes.fromhex(SALT), 100000).hex())
-    salted_breaches = db.query(SaltedBreach).filter_by(username=username, salted_password=hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), bytes.fromhex(SALT), 100000).hex(), salt=SALT).all()
+
+    # Check if the user has used this password breach of salted passwords before. 
+    # If the current hash of the hash of the password is equal to the hash of the 
+    # breached password using the same salt of the breach it has been breached.
+    salted_breaches = [user_breaches for user_breaches in db.query(SaltedBreach).filter_by(username=username).all() if hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), bytes.fromhex(user_breaches.salt), 100000).hex() == user_breaches.salted_password]
+
     return (plaintext_breaches, hashed_breaches, salted_breaches)
 
 
