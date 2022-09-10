@@ -1,5 +1,5 @@
 from csv import reader
-import hash
+#import hash
 
 from app.models.breaches import (
     create_plaintext_breach_entry,
@@ -32,7 +32,7 @@ def load_breaches(db):
         header = next(r)
         assert(header[0] == 'username')
         for creds in r:
-            create_hashed_breach_entry(db, creds[0], creds[1], creds[2])
+            create_salted_breach_entry(db, creds[0], creds[1], creds[2])
 
 
 
