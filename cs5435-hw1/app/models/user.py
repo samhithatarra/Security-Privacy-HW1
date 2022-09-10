@@ -1,6 +1,9 @@
 from sqlalchemy import Column, Integer, String
+import hashlib
 
 from app.models.base import Base
+
+SALT = "8d2d"
 
 class User(Base):
     __tablename__ = "users"
@@ -21,7 +24,7 @@ class User(Base):
 def create_user(db, username, password):
     user = User(
         username=username,
-        password=password,
+        password=hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), bytes.fromhex(SALT), 100000).hex(),
         coins=100,
     )
     db.add(user)

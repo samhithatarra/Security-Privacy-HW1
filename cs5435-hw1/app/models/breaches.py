@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String
+import hashlib
 
+from app.models.user import SALT
 from app.models.base import Base
 
 class PlaintextBreach(Base):
@@ -49,10 +51,13 @@ def create_salted_breach_entry(db, username, salted_password, salt):
     db.add(breach)
     return breach
 
-def get_breaches(db, username):
-    plaintext_breaches = db.query(PlaintextBreach).filter_by(username=username).all()
-    hashed_breaches = db.query(HashedBreach).filter_by(username=username).all()
-    salted_breaches = db.query(SaltedBreach).filter_by(username=username).all()
+def get_breaches(db, username, password):
+
+    plaintext_breaches = db.query(PlaintextBreach).filter_by(username=username, password=password).all()
+    hashed_breaches = db.query(HashedBreach).filter_by(username=username, hashed_password=hashlib.sha256(password.encode('utf-8')).hexdigest()).all()
+    print("test")
+    print(hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), bytes.fromhex(SALT), 100000).hex())
+    salted_breaches = db.query(SaltedBreach).filter_by(username=username, salted_password=hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), bytes.fromhex(SALT), 100000).hex(), salt=SALT).all()
     return (plaintext_breaches, hashed_breaches, salted_breaches)
 
 
