@@ -28,6 +28,11 @@ def attempt_login(username, password):
                     })
     return response.status_code == codes.ok
 
+def load_common_passwords():
+    with open(COMMON_PASSWORDS_PATH) as f:
+        pws = list(reader(f))
+    return pws
+
 def credential_stuffing_attack(creds):
     ans = []
     for usern, passw in creds:
@@ -52,12 +57,6 @@ def hashed_stuffing_attack(creds):
             finalcreds[u] = passw[p]
     credential_stuffing_attack(finalcreds.items())
 
-
-def load_common_passwords():
-    with open(COMMON_PASSWORDS_PATH) as f:
-        pws = list(reader(f))
-    return pws
-
 def salted_stuffing_attack(creds):
     common = load_common_passwords()
     passw = dict()
@@ -79,8 +78,14 @@ def main():
     creds = load_breach(PLAINTEXT_BREACH_PATH)
     hashed_creds = load_breach(HASHED_BREACH_PATH)
     salted_creds = load_breach(SALTED_BREACH_PATH)
+
+    print("Credential Stuffing Attack:")
     credential_stuffing_attack(creds)
+
+    print("Hashed Credential Stuffing Attack:")
     hashed_stuffing_attack(hashed_creds)
+
+    print("Salted Credential Stuffing Attack:")
     salted_stuffing_attack(salted_creds)
 
 
