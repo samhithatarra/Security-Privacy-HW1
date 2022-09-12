@@ -48,8 +48,7 @@ def do_login(db):
             response.status = 401
             error = "{} is already taken.".format(username)
 
-        elif get_breaches(db, username, password) != ([], [], []):
-            print(get_breaches(db, username, password))
+        elif user_has_breaches(db, username, password):
             response.status = 401
             error = "Username password combination found in breaches."
 
@@ -69,6 +68,14 @@ def do_login(db):
         return redirect("/{}".format(username))
         
     return template("login", error=error)
+
+def user_has_breaches(db, username, password):
+    (plaintext_breaches, hashed_breaches, salted_breaches) = get_breaches(db, username)
+
+    return any([user_breach for user_breach in plaintext_breaches if user_breach.username == username and user_breach.password == password]) \
+        or any([user_breach for user_breach in hashed_breaches if user_breach.username == username and user_breach.hashed_password == hashlib.sha256(password.encode('utf-8')).hexdigest()]) \
+        or any([user_breach for user_breach in salted_breaches if user_breach.username == username and hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), bytes.fromhex(user_breach.salt), 100000).hex() == user_breach.salted_password])
+
 
 @post('/logout')
 @logged_in
