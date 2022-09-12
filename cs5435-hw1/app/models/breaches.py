@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String
 import hashlib
 
-from app.models.user import SALT
 from app.models.base import Base
 
 class PlaintextBreach(Base):
