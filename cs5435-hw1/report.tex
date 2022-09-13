@@ -1,0 +1,87 @@
+\documentclass[11pt]{article}
+\usepackage{amsfonts,amsthm,amsmath,amssymb}
+\usepackage{array}
+\usepackage{epsfig}
+\usepackage{fullpage}
+\usepackage{xcolor}
+\usepackage{mathtools}
+
+\newcommand{\handout}[6]{
+   \renewcommand{\thepage}{\Large\bf #2 / Page \arabic{page}}
+   \noindent
+   \begin{center}
+   \framebox{
+      \vbox{
+    \hbox to 5.78in { {\bf #1}
+     	 \hfill #3 }
+       \vspace{4mm}
+       \hbox to 5.78in { {\Large \hfill #6  \hfill} }
+       \vspace{2mm}
+       \hbox to 5.78in { {\it #4 \hfill #5} }
+      }
+   }
+   \end{center}
+   \vspace*{4mm}
+}
+\newcommand{\exercise}[1]{{\vspace{6pt}\noindent\textbf{Exercise #1}}\quad}
+
+\begin{document}
+
+%%% FILL OUT THESE MACROS WITH YOUR DETAILS %%%
+\newcommand{\yournames}{Samhitha Tarra (st786), Martin Eckardt (me424)}
+\newcommand{\hwnumber}{1}
+
+\setlength\parindent{0pt}
+
+
+\handout{CS 5435 $-$ Security and Privacy Concepts in the Wild}{\color{gray}HW\hwnumber / \yournames{}}{ }%
+{Name: \yournames}%
+{Fall 2020}%
+{Homework \hwnumber}
+
+\exercise{3.1.1}
+
+\textbf{Offline brute force-guessing:}
+The CPU or GPU limit the number of guesses per time unit since it requires computation to execute the login procedure.
+
+\textbf{Online brute force-guessing:}
+The main limits to the guesses per time unit it the available bandwidth to send requests to the server, and -if implemented by the server - rate-limiting. In addition CPU/GPU and may be also a limiting factor but just the extend of being able to send a high number or requests and processing their responses.
+
+\exercise{3.1.2}
+
+The optimal strategy is to try the most likely password first and then move to the next most likely passwords in order of likeliness.
+
+Function: Sum of the likeliness of q most likely passwords, with p being the the probability of a password with index i being used. Indexes of the password are chosen such that the most likely password has the index 0 and the index of more likely passwords are lower than less likely passwords.
+
+\[success(q)=\sum_{i=1}^q p(i)\]
+
+\exercise{3.1.3}
+
+\textbf{Definition Shanon Entropy:}
+Shannon Entropy relates to how uncertain/chaotic the output will be. Specifically, it is the “measure of uncertainty associated with a random variable”. In relation to cryptographic functions, those with a full entropy will result in outputs that are completely random and unpredictable whereas something with low entropy results in outputs that are predictable and usable to solve for future values.
+
+\textbf{Example of a distribution p whose q-success probability is high and whose Shannon entropy is also high:}
+Let's take a four digit pin where the probability of a user picking the pin "0000" is 20\% and the probability of picking another of the remaining pins ("0001" - "9999") is equally distributed.
+
+\textbf{Explain why Shannon entropy is a misleading estimate of password strength.}
+Even though the space of possible passwords may be large (8 characters, numbers or special characters) the distribution of passwords may not use the space equally. Many users do not pick random passwords but rather something they can remember. Therefore names, words and dates are much more likely than wild combinations of characters, random numbers and special characters.
+
+\exercise{3.2}
+
+A pepper is stored separately from the salt and the hashed password to prevent it from being obtained by the attacker in case of a database breach. Therefore, in case of a breach where the hashed password and the salt are retrieved the attacker would still need to bruteforce all possible values since he  did not obtain the pepper. 
+
+By adding a pepper it is like another round of salting that the attacker would need to crack. Even if they were able to access the salted passwords and the salts, by storing the pepper elsewhere, none of these breached passwords would be able to be cracked without that pepper value. If the pepper value was also found it still increases the time it would take for the attacker to not only brute force all the salted passwords but now they must also brute force using every pepper value as well.
+
+\exercise{3.3}
+We would modify the service to implement rate limiting where if there are too many requests coming from one IP we can block it. 
+
+Additionally we would limit the login attempts per user. If too many login attempts fail within a time frame, we would temporarily lock out the user for some time or until the the real user contacts customer service or authenticates another way.
+
+\exercise{3.4}
+
+A too strict of a password policy will result in users writing down the password in insecure places, such as post its on their screen. Users may also just alter a common phrase/go to password of theirs to make it fit the requirements (ex: winning → Winning!). Furthermore, users may think that their password is so secure that they will reuse in multiple applications.
+
+Instead, we recommend not enforcing too many guidelines on the password other than a reasonable length (ex: 8-10 characters) and then should let the user know when they try to create the password if it was already found in a breach before. Furthermore, the strength of the selected password should be displayed to the user and additional security measures such as 2-factor authentication should be required or encouraged.
+
+
+\end{document}
